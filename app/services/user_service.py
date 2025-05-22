@@ -26,9 +26,13 @@ class UserService:
     def save_user(self, user: User):
         if self.repository.exists_by_name(user.name):
             raise InvalidRequestError(f"User with this name already exists: {user.name}")
-
         self.repository.save(user)
         return user
 
     def delete_user(self, user_id: int):
         self.repository.delete_by_id(user_id)
+
+    def get_user_by_name(self, username):
+        user = self.repository.get_by_name(username)
+        validate_user(user, UserNotFound(f"Does not exist with this name: {username}"))
+        return user

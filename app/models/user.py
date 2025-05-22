@@ -15,10 +15,9 @@ class User(db.Model):
     password_hash = db.Column(db.String(255), nullable=False)
 
     # Relationships
-    organized_event = db.relationship(
+    organized_events = db.relationship(
         'Event',
         back_populates='organizer',
-        uselist=False,
         cascade='all',
         passive_deletes=True
     )

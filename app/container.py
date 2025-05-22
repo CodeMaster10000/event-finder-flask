@@ -7,6 +7,7 @@ from app.services.app_service import AppService
 from app.services.event_service import EventService
 from app.services.user_service import UserService
 
+
 class Container(containers.DeclarativeContainer):
     wiring_config = containers.WiringConfiguration(packages=["app.routes"])
 

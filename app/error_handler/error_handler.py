@@ -4,7 +4,6 @@ from app.error_handler.exceptions import AppException
 
 
 def register_error_handlers(app):
-
     @app.errorhandler(AppException)
     def handle_app_exception(error):
         return {'error': error.message}, error.status_code

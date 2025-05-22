@@ -1,0 +1,29 @@
+version: '3.8'
+
+services:
+  db:
+    image: pgvector/pgvector:pg15
+    env_file:
+      - .env
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    ports:
+      - "${DB_PORT}:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  web:
+    image: event-finder:0.0.1
+    depends_on:
+      - db
+    env_file:
+      - .env
+    environment:
+      DATABASE_URL: "postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:${DB_PORT}/${POSTGRES_DB}"
+    ports:
+      - "${WEB_PORT}:5000"
+
+volumes:
+  pgdata:

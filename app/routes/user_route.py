@@ -53,7 +53,7 @@ class SpecificUserResource(Resource):
 @user_ns.route("/<string:name>")
 class GetUserByNameResource(Resource):
     @inject
-    def get(self, username: string, user_service: UserService = Provide[Container.user_service]):
-        """Get a user by id"""
-        user = user_service.get_user_by_name(username)
+    def get(self, name: string, user_service: UserService = Provide[Container.user_service]):
+        """Get a user by their name"""
+        user = user_service.get_user_by_name(name)
         return user_schema.user_single.dump(user), 200

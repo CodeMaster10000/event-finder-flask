@@ -15,7 +15,7 @@ class Event(db.Model):
     organizer_id = db.Column(db.Integer, db.ForeignKey('user.id', ondelete = 'CASCADE'), nullable=False)
     organizer = db.relationship(
         'User',
-        back_populates='organized_event'
+        back_populates='organized_events'
     )
 
     participants = db.relationship(

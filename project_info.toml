@@ -1,5 +1,0 @@
-[tool.poetry]
-name = "event-finder"
-version = "0.0.1"
-description = "Event Finder REST API"
-authors = ["Mile Stanislavov"]

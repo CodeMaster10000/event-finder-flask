@@ -1,6 +1,8 @@
+from pathlib import Path
 from flask import Flask
+from flask_migrate import Migrate, upgrade
 from flask_restx import Api
-from app.config import Config
+from app.configuration.config import Config
 from app.container import Container
 from app.routes.app_route import base_ns
 from app.routes.event_route import event_ns
@@ -22,9 +24,13 @@ def create_api(app: Flask):
     api.add_namespace(user_ns, path="/users")
     api.add_namespace(base_ns, path="/app")
 
+
 def create_app():
     app = Flask(__name__)
     app.config.from_object(Config)
+
+    # Register global error handlers
+    register_error_handlers(app)
 
     # Initialize extensions
     db.init_app(app)
@@ -40,14 +46,14 @@ def create_app():
         "app.routes.event_route",
     ])
 
-    # Register global error handlers
-    register_error_handlers(app)
+    Migrate(app, db)
 
-    # Auto-create tables based on db models
-    with app.app_context():
-        db.create_all()
+    # only auto-upgrade if the migrations folder is present
+    mig_dir = Path(__file__).resolve().parents[1] / "migrations"
+    if mig_dir.exists():
+        with app.app_context():
+            upgrade()
 
     create_api(app)
-
 
     return app

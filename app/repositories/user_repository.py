@@ -16,7 +16,7 @@ class UserRepository(BaseRepository, ABC):
         return self.session.filter_by(email=email).first()
 
     def get_by_name(self, name: str) -> User:
-        return self.session.filter_by(name=name).first()
+        return User.query.filter_by(name=name).first()
 
     def get_all(self):
         return self.session.query(User).all()
