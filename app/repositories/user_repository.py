@@ -1,6 +1,6 @@
 from abc import ABC
 
-from app.error_handler.exceptions import UserNotFound
+from app.error_handler.exceptions import UserNotFound, AppException
 from app.models.user import User
 from app.repositories.base_repository import BaseRepository
 
@@ -15,6 +15,9 @@ class UserRepository(BaseRepository, ABC):
     def get_by_email(self, email: str) -> User:
         return self.session.filter_by(email=email).first()
 
+    def get_by_name(self, name: str) -> User:
+        return self.session.filter_by(name=name).first()
+
     def get_all(self):
         return self.session.query(User).all()
 
@@ -28,7 +31,10 @@ class UserRepository(BaseRepository, ABC):
         if not user:
             raise UserNotFound(f"User with id {user_id} not found")
         self.session.delete(user)
-        self.session.commit()
+        try:
+            self.session.commit()
+        except BaseException as e:
+            raise AppException(f"Could not delete user, {e}", 500)
 
     def exists_by_id(self, user_id):
         return (self.session.query(User)

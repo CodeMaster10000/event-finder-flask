@@ -1,7 +1,6 @@
 from app.extensions import db
 
 # user - event MtM db association
-
 user_event_association = db.Table(
     'user_event',
     db.Column('user_id', db.Integer, db.ForeignKey('user.id')),
@@ -19,8 +18,9 @@ class User(db.Model):
     organized_event = db.relationship(
         'Event',
         back_populates='organizer',
-        lazy=True,
-        uselist=False
+        uselist=False,
+        cascade='all',
+        passive_deletes=True
     )
 
     participating_events = db.relationship(

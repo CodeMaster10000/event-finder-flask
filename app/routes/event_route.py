@@ -32,7 +32,7 @@ class EventResource(Resource):
     def delete(self, event_id, event_service: EventService = Provide[Container.event_service]):
         """Delete an event by id"""
         event_service.delete_event(event_id)
-        return {"message": f"Event {event_id} deleted"}, 200
+        return {"message": f"Event {event_id} successfully deleted"}, 200
 
 
 @event_ns.route("/organizer/<int:organizer_id>")
@@ -49,6 +49,5 @@ class EventCreateResource(Resource):
     def post(self, organizer_id, event_service: EventService = Provide[Container.event_service]):
         """Create a new event"""
         data = request.get_json()
-        event = Event(**data)
-        saved = event_service.create_event(organizer_id, event)
+        saved = event_service.create_event(organizer_id, Event(**data))
         return event_schema.event_single.dump(saved), 201

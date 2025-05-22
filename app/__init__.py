@@ -2,11 +2,11 @@ from flask import Flask
 from flask_restx import Api
 from app.config import Config
 from app.container import Container
-from app.controllers.app_controller import base_ns
-from app.controllers.event_controller import event_ns
-from app.controllers.user_controller import user_ns
+from app.routes.app_route import base_ns
+from app.routes.event_route import event_ns
+from app.routes.user_route import user_ns
 from app.error_handler.error_handler import register_error_handlers
-from app.extensions import db, ma, bcrypt, jwt
+from app.extensions import db, ma, jwt
 from app.services import user_service
 
 
@@ -29,22 +29,21 @@ def create_app():
     # Initialize extensions
     db.init_app(app)
     ma.init_app(app)
-    bcrypt.init_app(app)
     jwt.init_app(app)
 
     # Dependency injection
     container = Container()
     container.init_resources()
     container.wire(modules=[
-        "app.controllers.app_controller",
-        "app.controllers.user_controller",
-        "app.controllers.event_controller",
+        "app.routes.app_route",
+        "app.routes.user_route",
+        "app.routes.event_route",
     ])
 
     # Register global error handlers
     register_error_handlers(app)
 
-    # Auto-create tables (for dev)
+    # Auto-create tables based on db models
     with app.app_context():
         db.create_all()
 
@@ -52,4 +51,3 @@ def create_app():
 
 
     return app
-

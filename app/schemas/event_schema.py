@@ -12,6 +12,7 @@ class EventSchema(SQLAlchemyAutoSchema):
             'location',
             'time',
             'organizer_name',
+            'type',
             'participants',
         )
         load_instance = True
@@ -21,19 +22,16 @@ class EventSchema(SQLAlchemyAutoSchema):
     name = auto_field()
     location = auto_field()
     time = auto_field()
+    type = auto_field()
 
-    # grab the related User.name
-    organizer_name = fields.String(
-        attribute='organizer.name',
-        dump_only=True,
-    )
+    organizer_name = fields.Method('get_organizer_name', dump_only=True)
+    participants = fields.Method('get_participant_names', dump_only=True)
 
-    # for each User in .participants, grab .name
-    participants = fields.List(
-        fields.String(attribute='name'),
-        attribute='participants',
-        dump_only=True,
-    )
+    def get_organizer_name(self, event):
+        return event.organizer.name if event.organizer else None
+
+    def get_participant_names(self, event):
+        return [user.name for user in event.participants]
 
 
 event_many = EventSchema(many=True)

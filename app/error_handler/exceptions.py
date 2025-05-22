@@ -9,9 +9,9 @@ class UserNotFound(AppException):
         super().__init__(f"User error: {message}", 404)
 
 class Unauthorized(AppException):
-    def __init__(self, message):
-        super().__init__(f"Unauthorized: {message}", 401)
+    def __init__(self, message, status):
+        super().__init__(f"Unauthorized: {message}", status)
 
 class EventNotFound(AppException):
-    def __init__(self, message):
-        super().__init__(f"Event error: {message}", 404)
+    def __init__(self, message, status=404):
+        super().__init__(f"Event error: {message}", status)

@@ -1,19 +1,14 @@
-from flask_bcrypt import Bcrypt
 from sqlalchemy.exc import InvalidRequestError
 
 from app.error_handler.exceptions import UserNotFound
 from app.models.user import User
 from app.repositories.user_repository import UserRepository
+from app.util.validaton_util import validate_user
 
-
-def validate_user(user, exc):
-    if user is None:
-        raise exc
 
 class UserService:
-    def __init__(self, repository: UserRepository, bcrypt: Bcrypt):
+    def __init__(self, repository: UserRepository):
         self.repository = repository
-        self.bcrypt = bcrypt
 
     def get_all_users(self):
         return self.repository.get_all()
@@ -31,6 +26,7 @@ class UserService:
     def save_user(self, user: User):
         if self.repository.exists_by_name(user.name):
             raise InvalidRequestError(f"User with this name already exists: {user.name}")
+
         self.repository.save(user)
         return user
 

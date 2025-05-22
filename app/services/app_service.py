@@ -6,6 +6,11 @@ from app.services.event_service import validate_event
 from app.services.user_service import validate_user
 
 
+def validate_domain_presence(event, event_id, user, user_id):
+    validate_user(user, UserNotFound(f"User not found with id: {user_id}"))
+    validate_event(event, EventNotFound(f"Event not found with id: {event_id}"))
+
+
 class AppService:
     def __init__(
             self,
@@ -17,10 +22,20 @@ class AppService:
     def add_participant(self, event_id: int, user_id: int) -> Event:
         event = self.event_repository.get_by_id(event_id)
         user = self.user_repository.get_by_id(user_id)
-        validate_user(user, UserNotFound(f"Participant not found with id: {user_id}"))
-        validate_event(event, EventNotFound(f"Event not found with id: {event_id}"))
+        validate_domain_presence(event, event_id, user, user_id)
         if user in event.participants:
             raise AppException(f"User {user_id} already participating in event {event_id}", 400)
         event.participants.append(user)
         self.event_repository.save(event)
         return event
+
+    def remove_participant(self, event_id: int, user_id: int) -> Event:
+        event = self.event_repository.get_by_id(event_id)
+        user = self.user_repository.get_by_id(user_id)
+        validate_domain_presence(event, event_id, user, user_id)
+        if user in event.participants:
+            event.participants.remove(user)
+            self.event_repository.save(event)
+            return event
+        raise AppException(f"User {user_id} not participating in event {event_id}", 400)
+

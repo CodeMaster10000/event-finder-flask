@@ -5,11 +5,7 @@ from app.models.event import Event
 from app.repositories.event_repository import EventRepository
 from app.repositories.user_repository import UserRepository
 from app.services.user_service import validate_user
-
-
-def validate_event(event, exc):
-    if event is None:
-        raise exc
+from app.util.validaton_util import validate_event
 
 
 class EventService:
@@ -22,7 +18,7 @@ class EventService:
 
     def get_event(self, event_id: int) -> Event:
         event = self.repository.get_by_id(event_id)
-        validate_event(event, EventNotFound(f"Event not found for id: {event_id}"))
+        validate_event(event, EventNotFound(f"Event not found for id: {event_id}", 404))
         return event
 
     def create_event(self, organizer_id: int, event: Event):
@@ -32,10 +28,17 @@ class EventService:
         if self.repository.exists_by_name(event.name):
             raise InvalidRequestError(f"Event with name already exists: {event.name}")
 
-        event.organizer = organizer
-        self.repository.save(event)
-        return event
+        new_event = Event(
+            name=event.name,
+            location=event.location,
+            type=event.type,
+            organizer_id=organizer_id
+        )
+
+        saved_event = self.repository.save(new_event)
+        return saved_event
 
     def delete_event(self, event_id: int):
-        event = self.get_event(event_id)
-        self.repository.delete(event)
+        validate_event(self.repository.get_by_id(event_id), EventNotFound(f"Event not found for id: {event_id}"))
+        self.repository.delete_by_id(event_id)
+

@@ -22,19 +22,15 @@ class UserSchema(SQLAlchemyAutoSchema):
     surname = auto_field()
     email = auto_field()
 
-    # backref list of Events → pull each .id
-    participating_events = fields.List(
-        fields.Integer(attribute='id'),
-        attribute='participating_events',
-        dump_only=True,
-    )
+    participating_events = fields.Method("get_participating_event_ids", dump_only=True)
 
-    # single related Event → pull its .id
-    organized_event = fields.Integer(
-        attribute='organized_event.id',
-        dump_only=True,
-    )
+    organized_event = fields.Method("get_organized_event_id", dump_only=True)
 
+    def get_participating_event_ids(self, user):
+        return [event.id for event in user.participating_events]
+
+    def get_organized_event_id(self, user):
+        return user.organized_event.id if user.organized_event else None
 
 user_many = UserSchema(many=True)
 user_single = UserSchema()

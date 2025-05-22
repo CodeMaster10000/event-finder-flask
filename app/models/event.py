@@ -12,7 +12,7 @@ class Event(db.Model):
     type = db.Column(db.String(100), nullable=False)
     time = db.Column(db.DateTime, nullable=False, default=datetime.datetime.now())
 
-    organizer_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    organizer_id = db.Column(db.Integer, db.ForeignKey('user.id', ondelete = 'CASCADE'), nullable=False)
     organizer = db.relationship(
         'User',
         back_populates='organized_event'
