@@ -1,7 +1,9 @@
 from dependency_injector.wiring import inject, Provide
+from flask import request
 from flask_restx import Namespace, Resource
 from app.container import Container
 from app.services.app_service import AppService
+from app.services.chat_service import ChatService
 
 base_ns = Namespace('Application', description='Base application operations')
 
@@ -29,3 +31,17 @@ class ModifyParticipantResource(Resource):
         """Remove a guest from an event"""
         app_service.remove_participant(event_id, guest_id)
         return {'message': f'Guest: {guest_id} removed from event: {event_id}'}, 200
+
+
+@base_ns.route('/message-query')
+class MessageQueryResource(Resource):
+
+    @inject
+    @base_ns.doc(params={'user_prompt': 'User prompt'})
+    def get(
+            self,
+            chat_service: ChatService = Provide[Container.chat_service],
+    ):
+        user_prompt = request.args.get('prompt')
+        return {'response': chat_service.query(user_prompt)}
+

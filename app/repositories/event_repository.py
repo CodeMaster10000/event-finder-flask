@@ -23,7 +23,7 @@ class EventRepository(BaseRepository, ABC):
         self.session.add(event)
         try:
             self.session.commit()
-        except BaseException as e:
+        except Exception as e:
             self.session.rollback()
             raise AppException(f"Failed to save event: {e}", 500)
         return event
@@ -45,7 +45,6 @@ class EventRepository(BaseRepository, ABC):
                 is not None
         )
 
-
     def exists_by_name(self, name):
         return (
                 self.session.query(Event)
@@ -53,3 +52,26 @@ class EventRepository(BaseRepository, ABC):
                 .first()
                 is not None
         )
+
+    def search_by_embedding(self, vector: list[float], k: int = 5):
+        sql = text("""
+            SELECT
+              name,
+              type,
+              location,
+              time::text AS time_str
+            FROM event
+            WHERE embedding IS NOT NULL
+            ORDER BY embedding <-> :v
+            LIMIT :k
+        """)
+        rows = self.session.execute(sql, {"v": vector, "k": k}).all()
+        return [
+            {
+              "name":  r.name,
+              "type":  r.type,
+              "location": r.location,
+              "time":  r.time_str,
+            }
+            for r in rows
+        ]

@@ -18,6 +18,14 @@ class EventListResource(Resource):
         events = event_service.get_all_events()
         return event_schema.event_many.dump(events), 200
 
+@event_ns.route("")
+class EventEmbeddings(Resource):
+
+    @inject
+    def put(self, event_service: EventService = Provide[Container.event_service]):
+        """Embedd all events"""
+        event_service.create_embeddings_for_events()
+        return {"Finished embedding events": "Success"}, 200
 
 @event_ns.route("/<int:event_id>")
 class EventResource(Resource):

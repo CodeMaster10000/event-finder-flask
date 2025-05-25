@@ -4,6 +4,7 @@ from app.extensions import db
 from app.repositories.event_repository import EventRepository
 from app.repositories.user_repository import UserRepository
 from app.services.app_service import AppService
+from app.services.chat_service import ChatService
 from app.services.event_service import EventService
 from app.services.user_service import UserService
 
@@ -40,4 +41,9 @@ class Container(containers.DeclarativeContainer):
         AppService,
         event_repository=event_repository,
         user_repository=user_repository
+    )
+
+    chat_service = providers.Factory(
+        ChatService,
+        event_repository=event_repository
     )

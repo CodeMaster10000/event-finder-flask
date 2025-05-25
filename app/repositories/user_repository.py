@@ -33,7 +33,7 @@ class UserRepository(BaseRepository, ABC):
         self.session.delete(user)
         try:
             self.session.commit()
-        except BaseException as e:
+        except Exception as e:
             raise AppException(f"Could not delete user, {e}", 500)
 
     def exists_by_id(self, user_id):
