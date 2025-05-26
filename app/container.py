@@ -1,13 +1,30 @@
 from dependency_injector import containers, providers
 
+from app.configuration.config import Config
+from app.configuration.model_type import ModelType
 from app.extensions import db
+from app.repositories import event_repository
 from app.repositories.event_repository import EventRepository
 from app.repositories.user_repository import UserRepository
 from app.services.app_service import AppService
-from app.services.chat_service import ChatService
 from app.services.event_service import EventService
+from app.services.model.cloud.cloud_model_service import CloudModelService
+from app.services.model.local.local_model_service import LocalModelService
 from app.services.user_service import UserService
 
+
+def get_model_from_env():
+    model_type = Config.MODEL_TYPE
+    if model_type == ModelType.LOCAL:
+        return providers.Factory(
+            LocalModelService,
+            event_repository=event_repository,
+            model_name=Config.LOCAL_MODEL_NAME
+        )
+    return providers.Factory(
+        CloudModelService,
+        event_repository=event_repository
+    )
 
 class Container(containers.DeclarativeContainer):
     wiring_config = containers.WiringConfiguration(packages=["app.routes"])
@@ -43,7 +60,4 @@ class Container(containers.DeclarativeContainer):
         user_repository=user_repository
     )
 
-    chat_service = providers.Factory(
-        ChatService,
-        event_repository=event_repository
-    )
+    model_service = get_model_from_env()

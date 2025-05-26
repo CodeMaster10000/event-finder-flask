@@ -15,3 +15,7 @@ class Unauthorized(AppException):
 class EventNotFound(AppException):
     def __init__(self, message, status=404):
         super().__init__(f"Event error: {message}", status)
+
+class ModelException(AppException):
+    def __init__(self, message, status):
+        super().__init__(f"Model exception error: {message}", status)

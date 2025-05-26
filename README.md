@@ -1,6 +1,7 @@
 # Event Finder
 
-A Flask-based backend for the **Event Finder** application, providing a RESTful API to manage users and events with full CRUD support, authentication, and dependency injection.
+A Flask-based backend for the **Event Finder** application, providing a RESTful API to manage users and events with full CRUD support,
+authentication, dependency injection and AI support.
 
 ## Features
 
@@ -19,47 +20,10 @@ A Flask-based backend for the **Event Finder** application, providing a RESTful 
 - **Flask-Bcrypt**: Password hashing (bcrypt 4.3.0)
 - **marshmallow** & **marshmallow-sqlalchemy**: Schema-based (de)serialization
 - **dependency-injector**: Service and controller wiring
-- **pgvector**: Vector extension for PostgreSQL
-- **OpenAI**: Embeddings & ChatCompletion for RAG
-
-### Supplementary Libraries
-
-```text
-aniso8601==10.0.1
-attrs==25.3.0
-blinker==1.9.0
-click==8.1.8
-colorama==0.4.6
-flask-restx==1.3.0
-greenlet==3.2.1
-gunicorn==23.0.0
-importlib_resources==6.5.2
-iniconfig==2.1.0
-itsdangerous==2.2.0
-Jinja2==3.1.6
-jsonschema==4.23.0
-jsonschema-specifications==2025.4.1
-MarkupSafe==3.0.2
-packaging==25.0
-pluggy==1.6.0
-python-dotenv==1.1.0
-pytz==2025.2
-referencing==0.36.2
-rpds-py==0.24.0
-typing_extensions==4.13.2
-Werkzeug==3.1.3
-dependency-injector==4.46.0
-flask-marshmallow==1.3.0
-Flask-SQLAlchemy==3.1.1
-Flask-HTTPAuth==4.8.0
-Flask-JWT-Extended==4.7.1
-Flask-Bcrypt==1.0.1
-marshmallow==4.0.0
-marshmallow-sqlalchemy==1.4.2
-openai==0.27.0
-psycopg2-binary==2.9.7
-pgvector==0.4.2
-````
+- **pgvector**: Vector extension for PostgreSQL, used for RAG
+- **OpenAI** SDK for cloud embeddings and chat  
+- **sentence-transformers** 4.1.0, **transformers** 4.52.3 & **torch** 2.7.0 for local embeddings  
+- **Ollama** CLI for local LLM completions 
 
 ## Getting Started
 
@@ -79,72 +43,79 @@ source .venv/bin/activate  # On Windows: .\.venv\Scripts\activate
 
 ### 3. Install dependencies
 
-* **With Poetry** (recommended):
+#### After installing poetry, you might have to open a new terminal
 
   ```bash
-  poetry install
-  poetry install --with testing
-  ```
-
-* **With pip**:
-
-  ```bash
-  pip install --upgrade pip setuptools wheel
-  pip install -r requirements.txt
+    pip install poetry
+    poetry install
   ```
 
 ### 4. Configure environment variables
 
 Create a `.env` and a `.flaskenv` file in the project root:
 
+#### .env
 ```dotenv
-######.env######
 # Postgres credentials
-POSTGRES_USER=event_user
-POSTGRES_PASSWORD=event_pass
-POSTGRES_DB=event_db
+DATABASE_URL=postgresql://event_user:event_pass@localhost:5432/event_db
+
+# Ports
 DB_PORT=5432
 WEB_PORT=5000
 
-# Security & API keys
-OPENAI_API_KEY=sk-...
+#Embeddings
 VECTOR_DIM=1536
-######.env######
+MODEL_TYPE=local
+CLOUD_MODEL_API_KEY=xxx
+CLOUD_MODEL_EMBEDDER_NAME=text-embedding-ada-002
+LOCAL_MODEL_NAME=llama3.2-vision
+LOCAL_MODEL_EMBEDDER_NAME=sentence-transformers/all-mpnet-base-v2
+```
 
-# Flask & application settings - this goes in .flaskenv file
-######.flaskenv######
+#### .flaskenv
+```dotenv
 FLASK_APP=run.py
 FLASK_ENV=development
 DATABASE_URL="postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@localhost:${DB_PORT}/${POSTGRES_DB}"
-######.flaskenv######
-```
 
+```
 > **Note**: If Postgres runs in Docker with `ports: "5432:5432"`, set `localhost:5432`. Otherwise, use your container host.
 
 ### 5. Run database migrations
 
+ Start the database via docker-compose
 ```bash
-flask db init        # only once
-flask db migrate -m "Initial schema"
-flask db upgrade     # apply to the database
+  docker-compose up db    
+```
+
+ Run the migrations
+```bash
+  flask db upgrade     # apply to the database
 ```
 
 ### 6. Start the application
 
+  If you want **Local AI support**, make sure to have `MODEL_TYPE = local` in .**env**,
+  otherwise set it to `MODEL_TYPE = cloud` to use OpenAI
+  Next, have **Ollama started and an appropriate model up and running** locally!
+  **The application does not start the model for you!**
 ```bash
-flask run            # or via Docker Compose
-docker-compose up --build
+  flask run
+```
+ Or via Docker Compose
+
+ First, build the image, then run via docker-compose
+```bash
+  docker build -t event-finder:0.0.1 .    
+  docker-compose up web
 ```
 
 Visit [http://localhost:\${WEB\_PORT}/swagger/](http://localhost:${WEB_PORT}/swagger/) for Swagger UI and to explore the REST API.
 
 ## License
 
-This project is licensed under the MIT License.
+This project has no License
 
 ---
 
 *Maintained by Mile Stanislavov*
-
-```
-```

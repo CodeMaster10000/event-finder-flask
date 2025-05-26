@@ -5,6 +5,8 @@ from app.container import Container
 from app.services.app_service import AppService
 from app.services.chat_service import ChatService
 
+from app.services.model.model_service import ModelService
+
 base_ns = Namespace('Application', description='Base application operations')
 
 @base_ns.route('/<int:event_id>/<int:guest_id>')
@@ -40,8 +42,8 @@ class MessageQueryResource(Resource):
     @base_ns.doc(params={'user_prompt': 'User prompt'})
     def get(
             self,
-            chat_service: ChatService = Provide[Container.chat_service],
+            model_service: ModelService = Provide[Container.model_service],
     ):
         user_prompt = request.args.get('prompt')
-        return {'response': chat_service.query(user_prompt)}
+        return {'response': model_service.query(user_prompt)}
 
