@@ -95,10 +95,13 @@ DATABASE_URL="postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@localhost:${DB_
 
 ### 6. Start the application
 
-  If you want **Local AI support**, make sure to have `MODEL_TYPE = local` in .**env**,
+  - If you want **Local AI support**, make sure to have `MODEL_TYPE = local` in .**env**,
   otherwise set it to `MODEL_TYPE = cloud` to use OpenAI
-  Next, have **Ollama started and an appropriate model up and running** locally!
+  Next. Have **Ollama started and an appropriate model up and running** locally!
   **The application does not start the model for you!**
+  - For **cloud**, make sure to get an **API_KEY** from https://platform.openai.com/account/api-keys.
+    You might have to upgrade the billing plan—nothing comes free.
+
 ```bash
   flask run
 ```
