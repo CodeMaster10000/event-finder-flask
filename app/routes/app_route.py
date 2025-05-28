@@ -3,7 +3,6 @@ from flask import request
 from flask_restx import Namespace, Resource
 from app.container import Container
 from app.services.app_service import AppService
-from app.services.chat_service import ChatService
 
 from app.services.model.model_service import ModelService
 
@@ -39,11 +38,10 @@ class ModifyParticipantResource(Resource):
 class MessageQueryResource(Resource):
 
     @inject
-    @base_ns.doc(params={'user_prompt': 'User prompt'})
+    @base_ns.doc(params={'prompt': 'User prompt'})
     def get(
             self,
             model_service: ModelService = Provide[Container.model_service],
     ):
         user_prompt = request.args.get('prompt')
-        return {'response': model_service.query(user_prompt)}
-
+        return {'response': model_service.query_prompt(user_prompt)}

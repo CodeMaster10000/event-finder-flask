@@ -3,6 +3,7 @@ import pytest
 from app import create_app, db
 from app.models.event import Event
 from app.models.user import User
+from app.util.embedding_util import create_embedded_text
 
 
 @pytest.fixture
@@ -50,11 +51,14 @@ def test_event(test_user):
 @pytest.fixture
 def init_data(db_session, test_user, test_event):
     """Insert one User and one Event, return their IDs."""
+
+    embedding = create_embedded_text(test_event)
+    test_event.embedding = embedding
+
     db_session.add(test_user)
     db_session.add(test_event)
     db_session.commit()
 
-    # Refresh the objects to ensure they're up to date
     db_session.refresh(test_user)
     db_session.refresh(test_event)
 

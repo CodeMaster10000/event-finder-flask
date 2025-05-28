@@ -55,5 +55,4 @@ class EventService:
             if event.embedding is None:
                 embedding_vector = create_embedded_text(event)
                 event.embedding = embedding_vector
-                self.repository.save(event)
-
+        self.repository.save_all(events)

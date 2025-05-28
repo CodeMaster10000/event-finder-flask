@@ -38,3 +38,8 @@ def test_remove_participant_e2e(client, init_data, app):
         event = EventModel.query.get(event_id)
         user = UserModel.query.get(user_id)
         assert user not in event.participants
+
+def test_message_query_e2e(client, init_data):
+    prompt = "Hello, I want to go to a birthday party"
+    resp = client.get(f"/{base_path}/message-query?prompt={prompt}")
+    assert resp.status_code == 200

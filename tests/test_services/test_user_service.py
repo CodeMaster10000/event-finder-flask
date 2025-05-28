@@ -12,16 +12,9 @@ from app.services.user_service import UserService
 def mock_repo():
     return MagicMock()
 
-
 @pytest.fixture
-def mock_bcrypt():
-    # bcrypt isn’t used in these methods, but required by the ctor
-    return MagicMock()
-
-
-@pytest.fixture
-def svc(mock_repo, mock_bcrypt):
-    return UserService(repository=mock_repo, bcrypt=mock_bcrypt)
+def svc(mock_repo):
+    return UserService(repository=mock_repo)
 
 
 @pytest.fixture
