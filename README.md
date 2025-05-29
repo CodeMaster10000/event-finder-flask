@@ -11,7 +11,7 @@ authentication, dependency injection and AI support.
 - **Authentication**: JWT-based guard for protected endpoints
 - **Serialization**: Marshmallow schemas for clean request/response modeling
 - **Dependency Injection**: `dependency-injector` for wiring controllers and services
-
+- **AI Support**: `ollama` and `OpenAI` for dynamic event retrieval and embedding
 ## Technologies & Dependencies
 
 - **Flask**: Web framework (3.1.0)
