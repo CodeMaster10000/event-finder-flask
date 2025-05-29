@@ -17,7 +17,7 @@ def mock_user_repo():
 
 @pytest.fixture
 def svc(mock_repo, mock_user_repo):
-    return EventService(repository=mock_repo, user_repository=mock_user_repo)
+    return EventService(event_repository=mock_repo, user_repository=mock_user_repo)
 
 @pytest.fixture
 def dummy_user():

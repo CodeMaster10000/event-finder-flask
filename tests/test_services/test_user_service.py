@@ -14,7 +14,7 @@ def mock_repo():
 
 @pytest.fixture
 def svc(mock_repo):
-    return UserService(repository=mock_repo)
+    return UserService(user_repository=mock_repo)
 
 
 @pytest.fixture
@@ -55,11 +55,16 @@ def test_get_user_by_email_not_found_raises(svc, mock_repo):
         svc.get_user_by_email("bob@example.com")
     assert "Does not exist with this email: bob@example.com" in str(exc.value)
 
-def test_save_user_success(svc, mock_repo, dummy_user):
+def test_save_user_success(svc, mock_repo, dummy_user, monkeypatch):
+    monkeypatch.setattr(
+        'app.services.user_service.create_password_hash',
+        lambda pw: f"hashed[{pw}]"
+    )
     mock_repo.exists_by_name.return_value = False
     result = svc.save_user(dummy_user)
     mock_repo.save.assert_called_once_with(dummy_user)
     assert result is dummy_user
+
 
 def test_save_user_name_exists_raises(svc, mock_repo, dummy_user):
     mock_repo.exists_by_name.return_value = True

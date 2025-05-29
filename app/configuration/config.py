@@ -15,6 +15,7 @@ def get_model_type(model_type: str) -> ModelType:
         return ModelType.CLOUD
 
 class Config:
+    DB_NAME = os.environ.get("DB_NAME", "events_db")
     SQLALCHEMY_DATABASE_URI = os.environ.get("DATABASE_URL")
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     VECTOR_DIM = int(os.environ.get("VECTOR_DIM", "1536"))

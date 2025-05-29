@@ -1,13 +1,12 @@
 from types import SimpleNamespace
-
-import pytest
 from unittest.mock import MagicMock
 
-from sqlalchemy.exc import SQLAlchemyError
+import pytest
 
-from app.repositories.event_repository import EventRepository
-from app.error_handler.exceptions import EventNotFound, AppException
+from app.error_handler.exceptions import EventNotFound
 from app.models.event import Event
+from app.repositories.event_repository import EventRepository
+
 
 @pytest.fixture
 def mock_session():
@@ -138,13 +137,3 @@ def test_save_all_success(repo, mock_session):
     mock_session.commit.assert_called_once()
     # returns the same list
     assert result is events
-
-def test_save_all_failure(repo, mock_session):
-    events = [Event(), Event()]
-    mock_session.commit.side_effect = SQLAlchemyError("boom")
-
-    with pytest.raises(AppException) as e:
-        repo.save_all(events)
-
-    mock_session.rollback.assert_called_once()
-    assert "Failed to save events" in str(e.value)

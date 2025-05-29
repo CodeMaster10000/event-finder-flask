@@ -3,14 +3,14 @@ import string
 from dependency_injector.wiring import inject, Provide
 from flask import request
 from flask_restx import Namespace, Resource, fields
-
 from app.container import Container
 from app.models.user import User
 from app.schemas import user_schema
 from app.services.user_service import UserService
+from app import extensions
 
 user_ns = Namespace("users", description="User based operations")
-
+auth = extensions.auth
 
 @user_ns.route("")
 class UserBaseResource(Resource):
@@ -45,6 +45,7 @@ class SpecificUserResource(Resource):
         return user_schema.user_single.dump(user), 200
 
     @inject
+    @auth.login_required
     def delete(self, user_id: int, user_service: UserService = Provide[Container.user_service]):
         """Delete a user by id"""
         user_service.delete_user(user_id)
@@ -52,6 +53,7 @@ class SpecificUserResource(Resource):
 
 @user_ns.route("/<string:name>")
 class GetUserByNameResource(Resource):
+    @auth.login_required
     @inject
     def get(self, name: string, user_service: UserService = Provide[Container.user_service]):
         """Get a user by their name"""

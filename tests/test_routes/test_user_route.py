@@ -1,6 +1,8 @@
-from tests.conftest import test_user
+from tests.conftest import test_user, username, password
+from tests.test_routes.auth_data import get_auth_header
 
 base_path = "users"
+
 
 def test_get_all_users_e2e(client, init_data):
     user_id, _ = init_data
@@ -15,6 +17,7 @@ def test_get_all_users_e2e(client, init_data):
     assert isinstance(data, list)
     ids = [u["id"] for u in data]
     assert user_id in ids
+
 
 def test_get_user_by_id_e2e(client, init_data, test_user):
     """
@@ -31,6 +34,7 @@ def test_get_user_by_id_e2e(client, init_data, test_user):
     assert user["email"] == test_user_obj.email
     assert user["surname"] == test_user_obj.surname
 
+
 def test_create_user_e2e(client, init_data):
     """
     POST /users should create a new user.
@@ -44,7 +48,11 @@ def test_create_user_e2e(client, init_data):
 
     resp = client.post(
         f"/{base_path}",
-        json=new_user
+        json=new_user,
+        headers=get_auth_header(
+            username,
+            password
+        )
     )
     assert resp.status_code == 201
 
@@ -61,13 +69,17 @@ def test_create_user_e2e(client, init_data):
     assert get_resp.status_code == 200
     assert get_resp.get_json()["id"] == new_id
 
+
 def test_delete_user_e2e(client, init_data):
     """
     DELETE /users/<id> should delete the user.
     """
     user_id, _ = init_data
 
-    resp = client.delete(f"/{base_path}/{user_id}")
+    resp = client.delete(f"/{base_path}/{user_id}", headers=get_auth_header(
+        username,
+        password
+    ))
     assert resp.status_code == 200
     data = resp.get_json()
     assert data["message"] == f"User {user_id} deleted successfully"

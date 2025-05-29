@@ -30,7 +30,7 @@ class TestUserSchema(unittest.TestCase):
 
         self.assertEqual(result["id"], 1)
         self.assertEqual(result["name"], "Alice")
-        self.assertEqual(result["organized_event"], 100)
+        self.assertEqual(result["organized_events"], [self.event.name])
         self.assertEqual(result["participating_events"], [])
 
     def test_user_schema_participant(self):
@@ -39,8 +39,8 @@ class TestUserSchema(unittest.TestCase):
 
         self.assertEqual(result["id"], 2)
         self.assertEqual(result["name"], "Bob")
-        self.assertIsNone(result["organized_event"])
-        self.assertEqual(result["participating_events"], [100])
+        self.assertEqual(result["organized_events"], [])
+        self.assertEqual(result["participating_events"], [self.event.name])
 
 
 if __name__ == "__main__":

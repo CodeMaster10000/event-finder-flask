@@ -26,7 +26,7 @@ def get_model_from_env(event_repository: Factory[EventRepository]):
     )
 
 class Container(containers.DeclarativeContainer):
-    wiring_config = containers.WiringConfiguration(packages=["app.routes"])
+    wiring_config = containers.WiringConfiguration(packages=["app.routes", "app.services"])
 
     db_session = providers.Singleton(lambda: db.session)
 
@@ -44,12 +44,12 @@ class Container(containers.DeclarativeContainer):
     # Services
     user_service = providers.Factory(
         UserService,
-        repository=user_repository
+        user_repository=user_repository
     )
 
     event_service = providers.Factory(
         EventService,
-        repository=event_repository,
+        event_repository=event_repository,
         user_repository=user_repository
     )
 

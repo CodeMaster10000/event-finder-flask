@@ -4,10 +4,11 @@ from flask_restx import Resource, Namespace, fields
 from app.container import Container
 from app.models.event import Event
 from app.schemas import event_schema
-
 from app.services.event_service import EventService
+from app import extensions
 
 event_ns = Namespace("events", description="Event operations")
+auth = extensions.auth
 
 @event_ns.route("")
 class EventListResource(Resource):
@@ -18,14 +19,15 @@ class EventListResource(Resource):
         events = event_service.get_all_events()
         return event_schema.event_many.dump(events), 200
 
-@event_ns.route("")
+@event_ns.route("/embedd")
 class EventEmbeddings(Resource):
 
     @inject
+    @auth.login_required
     def put(self, event_service: EventService = Provide[Container.event_service]):
         """Embedd all events"""
         event_service.create_embeddings_for_events()
-        return {"Finished embedding events": "Success"}, 200
+        return {"Finished embedding events": "Success"}, 201
 
 @event_ns.route("/<int:event_id>")
 class EventResource(Resource):
@@ -37,6 +39,7 @@ class EventResource(Resource):
         return event_schema.event_single.dump(event), 200
 
     @inject
+    @auth.login_required
     def delete(self, event_id, event_service: EventService = Provide[Container.event_service]):
         """Delete an event by id"""
         event_service.delete_event(event_id)
@@ -54,6 +57,7 @@ class EventCreateResource(Resource):
 
     @event_ns.expect(event_input)
     @inject
+    @auth.login_required
     def post(self, organizer_id, event_service: EventService = Provide[Container.event_service]):
         """Create a new event"""
         data = request.get_json()

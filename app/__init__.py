@@ -25,7 +25,7 @@ def create_api(app: Flask):
     api.add_namespace(base_ns, path="/app")
 
 
-def create_app():
+def create_app(migrations_dir: Path | None = None):
     app = Flask(__name__)
     app.config.from_object(Config)
 
@@ -46,11 +46,14 @@ def create_app():
         "app.routes.event_route",
     ])
 
-    Migrate(app, db)
+    if migrations_dir is not None:
+        Migrate(app, db, directory=str(migrations_dir))
+    else:
+        Migrate(app, db)
 
     # only auto-upgrade if the migrations folder is present
-    mig_dir = Path(__file__).resolve().parents[1] / "migrations"
-    if mig_dir.exists():
+    migrate_dir = migrations_dir or (Path(__file__).resolve().parents[1] / "migrations")
+    if migrate_dir.exists():
         with app.app_context():
             upgrade()
 

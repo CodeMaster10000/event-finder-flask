@@ -38,4 +38,3 @@ class AppService:
             self.event_repository.save(event)
             return event
         raise AppException(f"User {user_id} not participating in event {event_id}", 400)
-

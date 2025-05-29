@@ -2,6 +2,7 @@ from abc import ABC
 
 from sqlalchemy import text
 from sqlalchemy import select
+from sqlalchemy.exc import SQLAlchemyError
 from app.error_handler.exceptions import EventNotFound, AppException
 from app.models.event import Event
 from app.repositories.base_repository import BaseRepository

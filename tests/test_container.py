@@ -10,18 +10,14 @@ class TestContainer(unittest.TestCase):
     def setUp(self):
         # Patch external dependencies
         self.db_patch = patch("app.container.db")
-        self.bcrypt_patch = patch("app.container.bcrypt")
 
         self.mock_db = self.db_patch.start()
-        self.mock_bcrypt = self.bcrypt_patch.start()
 
         self.mock_db.session = MagicMock(name="db.session")
-        self.mock_bcrypt_instance = MagicMock(name="bcrypt")
 
         # Rebind the providers with mocks
         self.container = Container()
         self.container.db_session.override(self.mock_db.session)
-        self.container.password_hasher.override(self.mock_bcrypt_instance)
 
     def tearDown(self):
         patch.stopall()
@@ -29,7 +25,6 @@ class TestContainer(unittest.TestCase):
     def test_user_service_resolution(self):
         user_service = self.container.user_service()
         self.assertIsInstance(user_service, UserService)
-        self.assertIs(user_service.bcrypt, self.mock_bcrypt_instance)
 
     def test_event_service_resolution(self):
         event_service = self.container.event_service()

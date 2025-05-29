@@ -1,6 +1,8 @@
-from tests.conftest import test_event
+from tests.conftest import test_event, username, password
+from tests.test_routes.auth_data import get_auth_header
 
 base_path = "events"
+
 
 def test_get_all_events_e2e(client, init_data):
     """
@@ -17,6 +19,7 @@ def test_get_all_events_e2e(client, init_data):
     ids = [e["id"] for e in data]
     assert event_id in ids
 
+
 def test_get_event_by_id_e2e(client, init_data, test_event):
     """
     GET /events/<id> should return the specific event.
@@ -32,6 +35,7 @@ def test_get_event_by_id_e2e(client, init_data, test_event):
     assert ev["location"] == test_event.location
     assert ev["type"] == test_event.type
 
+
 def test_create_event_e2e(client, init_data):
     """
     POST /events/organizer/<organizer_id> should create a new event.
@@ -45,7 +49,11 @@ def test_create_event_e2e(client, init_data):
 
     resp = client.post(
         f"/{base_path}/organizer/{user_id}",
-        json=new_event
+        json=new_event,
+        headers=get_auth_header(
+            username,
+            password
+        )
     )
     assert resp.status_code == 201
 
@@ -60,13 +68,25 @@ def test_create_event_e2e(client, init_data):
     assert get_resp.status_code == 200
     assert get_resp.get_json()["id"] == new_id
 
+
 def test_delete_event_e2e(client, init_data):
     """
     DELETE /events/<id> should delete the event.
     """
     _, event_id = init_data
 
-    resp = client.delete(f"/{base_path}/{event_id}")
+    resp = client.delete(f"/{base_path}/{event_id}", headers=get_auth_header(
+        username,
+        password
+    ))
     data = resp.get_json()
     assert resp.status_code == 200
     assert data["message"] == f"Event {event_id} successfully deleted"
+
+
+def test_embedd_events(client, init_data):
+    resp = client.put(f"/{base_path}/embedd", headers=get_auth_header(
+        username,
+        password
+    ))
+    assert resp.status_code == 201

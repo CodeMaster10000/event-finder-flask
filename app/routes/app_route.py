@@ -1,17 +1,20 @@
 from dependency_injector.wiring import inject, Provide
 from flask import request
 from flask_restx import Namespace, Resource
+
+from app import extensions
 from app.container import Container
 from app.services.app_service import AppService
-
 from app.services.model.model_service import ModelService
 
 base_ns = Namespace('Application', description='Base application operations')
+auth = extensions.auth
 
 @base_ns.route('/<int:event_id>/<int:guest_id>')
 class ModifyParticipantResource(Resource):
 
     @inject
+    @auth.login_required
     def put(
         self,
         event_id: int,
@@ -23,6 +26,7 @@ class ModifyParticipantResource(Resource):
         return {'message': f'Guest: {guest_id} added to event: {event_id}'}, 201
 
     @inject
+    @auth.login_required
     def delete(
         self,
         event_id: int,
